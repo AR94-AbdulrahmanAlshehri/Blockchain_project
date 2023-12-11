@@ -205,9 +205,10 @@ def new_transaction():
                 received_amount = received_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["sender"]:
                 spent_amount = spent_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
-    
+
+    # validation of sender    
     if received_amount <= 0:
-        return ("Not a valid Sender", 400)
+        return (f"{values["sender"]} is not a valid Sender", 400)
 
     # to avoid double spending during creation of block 
     for current_transaction in range(len(blockchain.current_transactions)):
