@@ -12,7 +12,7 @@ import requests
 from urllib.parse import urlparse
 
 class Blockchain(object):
-    network_difficulty = 16
+    network_difficulty = 128
     initial_hash = "0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     obfuscation_key = 30
 
@@ -212,7 +212,7 @@ def new_transaction():
 
     # calculating balance 
     balance = received_amount - spent_amount
-    if balance <= values["amount"]:
+    if balance < values["amount"]:
         return ("You Don't have enough balance", 400)
     
     # create a new transaction 
