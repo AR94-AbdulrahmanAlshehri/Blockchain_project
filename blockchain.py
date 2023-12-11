@@ -12,7 +12,7 @@ import requests
 from urllib.parse import urlparse
 
 class Blockchain(object):
-    network_difficulty = 16
+    network_difficulty = 1
     initial_hash = "0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     obfuscation_key = 30
 
@@ -197,12 +197,14 @@ def new_transaction():
 
     received_amount = 0
     spent_amount = 0
+    identiy_check = False
 
     # Check how much cryptocurrency transaction sender have received and spent 
     for block in range(len(blockchain.chain)):
         for transaction in range(len(blockchain.chain[block]["transactions"])):
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["recipient"]:
                 received_amount = received_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
+                identiy_check = True
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["sender"]:
                 spent_amount = spent_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
     
@@ -210,14 +212,12 @@ def new_transaction():
     for current_transaction in range(len(blockchain.current_transactions)):
         if values["sender"] == blockchain.current_transactions[current_transaction]["sender"]:
             received_amount = received_amount - blockchain.current_transactions[current_transaction]["amount"] + blockchain.obfuscation_key
-    
-    # Sender verification close
-    if received_amount == 0 and spent_amount == 0:
-        return ("Sender is not valid", 400)
 
     # calculating balance 
     balance = received_amount - spent_amount
-    if balance < values["amount"]:
+    if identiy_check == False:
+        return ("Not a valid user", 400)
+    elif balance < values["amount"]:
         return ("You Don't have enough balance", 400)
     
     # create a new transaction 
