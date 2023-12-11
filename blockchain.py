@@ -197,17 +197,18 @@ def new_transaction():
 
     received_amount = 0
     spent_amount = 0
-    identiy_check = False
 
     # Check how much cryptocurrency transaction sender have received and spent 
     for block in range(len(blockchain.chain)):
         for transaction in range(len(blockchain.chain[block]["transactions"])):
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["recipient"]:
                 received_amount = received_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
-                identiy_check = True
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["sender"]:
                 spent_amount = spent_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
     
+    if received_amount <= 0:
+        return ("Not a valid Sender", 400)
+
     # to avoid double spending during creation of block 
     for current_transaction in range(len(blockchain.current_transactions)):
         if values["sender"] == blockchain.current_transactions[current_transaction]["sender"]:
@@ -215,9 +216,8 @@ def new_transaction():
 
     # calculating balance 
     balance = received_amount - spent_amount
-    if identiy_check == False:
-        return ("Not a valid Sender", 400)
-    elif balance < values["amount"]:
+
+    if balance < values["amount"]:
         return ("You Don't have enough balance", 400)
     
     # create a new transaction 
