@@ -12,7 +12,7 @@ import requests
 from urllib.parse import urlparse
 
 class Blockchain(object):
-    network_difficulty = 128
+    network_difficulty = 16
     initial_hash = "0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     obfuscation_key = 30
 
@@ -205,6 +205,11 @@ def new_transaction():
                 received_amount = received_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
             if values["sender"] == blockchain.chain[block]["transactions"][transaction]["sender"]:
                 spent_amount = spent_amount + blockchain.chain[block]["transactions"][transaction]["amount"] - blockchain.obfuscation_key
+    
+    # to avoid double spending during creation of block 
+    for current_transaction in range(len(blockchain.current_transactions)):
+        if values["sender"] == blockchain.current_transactions[current_transaction]["sender"]:
+            received_amount = received_amount - blockchain.current_transactions[current_transaction]["amount"] + blockchain.obfuscation_key
     
     # Sender verification close
     if received_amount == 0 and spent_amount == 0:
